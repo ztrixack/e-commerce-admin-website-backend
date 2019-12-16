@@ -20,7 +20,8 @@ const config = {
   jwt: {
     salt: 13,
     secret: process.env.JWT_SECRET,
-  }
+  },
+  allowedOrigins: (process.env.ALLOWED_ORIGINS || '').split(','),
 };
 
 module.exports = config;
