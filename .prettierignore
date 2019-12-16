@@ -1,0 +1,13 @@
+build/
+config/
+docs/
+env/
+internals/
+k8s/
+node_modules/
+server/
+
+*.config.js
+package.json
+package-lock.json
+
