@@ -1,31 +1,36 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+const compression = require('compression');
+const morgan = require('morgan');
+
+const config = require('./config');
 
 const app = express();
-const { PORT = 5000 } = process.env;
 
-app.get('/', (req, res) => { res.send('App is working'); });
+if (config.debug) {
+  app.use(morgan('dev'));
+} else {
+  app.use(morgan('common'));
+}
 
-app.use((req, res, next) => {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
-app.use((err, req, res) => {
-  res.status(err.status || 500);
-  res.json({'errors': {
-    message: err.message,
-    error: {}
-  }});
-});
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(compression());
+
+const indexRouter = require('./routes/index');
+const errorRouter = require('./routes/error');
+
+app.use('/', indexRouter);
+app.use('*', errorRouter);
 
 async function startServer() {    
-  app.listen(PORT, err => {
+  app.listen(config.port, err => {
     if (err) {
       console.log(err);
       return;
     }
 
-    console.log('server started at port:' + PORT);
+    console.log('server started at port:' + config.port);
   });
 }
 
