@@ -14,6 +14,9 @@ const config = {
   api: {
     prefix: '/api/v1',
   },
+  mongodb: {
+    url: process.env.MONGO_URL,
+  },
 };
 
 module.exports = config;

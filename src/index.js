@@ -1,21 +1,14 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const compression = require('compression');
-const morgan = require('morgan');
 
 const config = require('./config');
 
+const databaseConfig = require('./config/database');
+const middlewareConfig = require('./config/middleware');
+
 const app = express();
 
-if (config.debug) {
-  app.use(morgan('dev'));
-} else {
-  app.use(morgan('common'));
-}
-
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(compression());
+databaseConfig();
+middlewareConfig(app);
 
 const indexRouter = require('./routes/index');
 const errorRouter = require('./routes/error');
