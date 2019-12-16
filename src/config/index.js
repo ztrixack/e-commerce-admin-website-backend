@@ -17,6 +17,10 @@ const config = {
   mongodb: {
     url: process.env.MONGO_URL,
   },
+  jwt: {
+    salt: 13,
+    secret: process.env.JWT_SECRET,
+  }
 };
 
 module.exports = config;

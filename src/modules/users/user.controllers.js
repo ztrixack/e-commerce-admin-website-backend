@@ -9,4 +9,9 @@ const signup = async (req, res) => {
   }
 }
 
-module.exports = { signup };
+const login = (req, res, next) => {
+  res.status(200).json(req.user);
+  return next();
+}
+
+module.exports = { signup, login };

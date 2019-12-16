@@ -1,6 +1,9 @@
+const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const validator = require('validator');
+const jwt = require('jsonwebtoken');
 
+const config = require('../../config');
 const validations = require('./user.validations');
 
 const UserSchema = new mongoose.Schema({
@@ -45,5 +48,37 @@ const UserSchema = new mongoose.Schema({
     },
   },
 });
+
+UserSchema.pre('save', function (next) {
+  if (this.isModified('password')) {
+    this.password = this._hashPassword(this.password);
+  }
+
+  return next();
+});
+
+UserSchema.methods = {
+  _hashPassword(password) {
+    return bcrypt.hashSync(password, config.jwt.salt);
+  },
+  authenticateUser(password) {
+    return bcrypt.compareSync(password, this.password);
+  },
+  createToken() {
+    return jwt.sign(
+      {
+        _id: this._id,
+      },
+      config.jwt.secret,
+    );
+  },
+  toJSON() {
+    return {
+      _id: this._id,
+      username: this.username,
+      accesstoken: this.createToken(),
+    };
+  },
+};
 
 module.exports = mongoose.model('User', UserSchema);
