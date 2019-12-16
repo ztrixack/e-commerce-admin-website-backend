@@ -11,9 +11,11 @@ databaseConfig();
 middlewareConfig(app);
 
 const indexRouter = require('./routes/index');
+const apiRouter = require('./modules');
 const errorRouter = require('./routes/error');
 
 app.use('/', indexRouter);
+apiRouter(app);
 app.use('*', errorRouter);
 
 async function startServer() {    
