@@ -14,8 +14,10 @@ const config = {
   api: {
     prefix: '/api/v1',
   },
-  mongodb: {
-    url: process.env.MONGO_URL,
+  database: {
+    connector: process.env.DATABASE_CONNECTOR,
+    url: process.env.DATABASE_URL,
+    sql: process.env.DATABASE_CONNECTOR === 'postgresdb'
   },
   jwt: {
     salt: 13,
