@@ -2,12 +2,12 @@ const express = require('express');
 
 const config = require('./config');
 
-const databaseConfig = require('./config/database');
+// const databaseConfig = require('./config/database.mongoose');
 const middlewareConfig = require('./config/middleware');
 
 const app = express();
 
-databaseConfig();
+// databaseConfig();
 middlewareConfig(app);
 
 const indexRouter = require('./routes/index');
