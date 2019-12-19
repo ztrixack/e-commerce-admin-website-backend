@@ -10,5 +10,6 @@ const routes = new Router();
 
 routes.post('/signup', validate(validations.signup), controllers.signup);
 routes.post('/login', services.authLocal, controllers.login);
+routes.get('/me', services.authJwt, controllers.retrieve);
 
 module.exports = routes;

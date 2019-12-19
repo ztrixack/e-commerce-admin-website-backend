@@ -10,20 +10,23 @@ const localOpts = {
   usernameField: 'username',
 };
 
-const localStrategy = new LocalStrategy(localOpts, async (username, password, done) => {
-  try {
-    const user = await User.findOne({ username });
-    if (!user) {
-      return done(null, false);
-    } else if (!user.authenticateUser(password)) {
-      return done(null, false);
-    }
+const localStrategy = new LocalStrategy(
+  localOpts,
+  async (username, password, done) => {
+    try {
+      const user = await User.findOne({ username });
+      if (!user) {
+        return done(null, false);
+      } else if (!user.authenticateUser(password)) {
+        return done(null, false);
+      }
 
-    return done(null, user);
-  } catch (e) {
-    return done(e, false);
-  }
-});
+      return done(null, user);
+    } catch (e) {
+      return done(e, false);
+    }
+  },
+);
 
 const jwtOpts = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

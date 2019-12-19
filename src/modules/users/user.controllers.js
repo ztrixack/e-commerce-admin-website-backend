@@ -8,11 +8,14 @@ const signup = async (req, res) => {
     console.log(e);
     return res.status(500).json(e);
   }
-}
+};
 
 const login = (req, res, next) => {
-  res.status(200).json(req.user);
-  return next();
-}
+  return res.status(200).json(req.user.toJSONToken());
+};
 
-module.exports = { signup, login };
+const retrieve = (req, res) => {
+  return res.status(200).json(req.user);
+};
+
+module.exports = { signup, login, retrieve };

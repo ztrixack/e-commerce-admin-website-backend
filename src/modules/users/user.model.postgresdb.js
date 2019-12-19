@@ -38,10 +38,10 @@ const UserOptions = {
   freezeTableName: true,
   hooks: {
     beforeCreate: (user, options) => {
-      user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(config.jwt.salt));
-    },
-    afterCreate: (user, options) => {
-      return user.toJSON();
+      user.password = bcrypt.hashSync(
+        user.password,
+        bcrypt.genSaltSync(config.jwt.salt),
+      );
     },
   },
 };
@@ -50,8 +50,13 @@ let UserModel;
 
 if (config.database.sql) {
   const sequelize = db();
-  UserModel = sequelize.define('users', UserSchema, UserOptions)
+  UserModel = sequelize.define('users', UserSchema, UserOptions);
   UserModel.prototype.toJSON = function() {
+    const values = Object.assign({}, this.get());
+    delete values.password;
+    return values;
+  };
+  UserModel.prototype.toJSONToken = function() {
     return {
       _id: this.id,
       username: this.username,
@@ -68,6 +73,9 @@ if (config.database.sql) {
   };
   UserModel.prototype.authenticateUser = function(password) {
     return bcrypt.compareSync(password, this.password);
+  };
+  UserModel.findById = function(id) {
+    return UserModel.findOne({ where: { id } });
   };
 
   UserModel.sync();
