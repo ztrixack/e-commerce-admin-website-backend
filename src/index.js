@@ -18,7 +18,7 @@ app.use('/', indexRouter);
 apiRouter(app);
 app.use('*', errorRouter);
 
-async function startServer() {    
+async function startServer() {
   app.listen(config.port, err => {
     if (err) {
       console.log(err);

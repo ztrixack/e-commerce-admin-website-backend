@@ -77,6 +77,9 @@ if (config.database.sql) {
   UserModel.findById = function(id) {
     return UserModel.findOne({ where: { id } });
   };
+  UserModel.findByUsername = function(username) {
+    return UserModel.findOne({ where: { username } });
+  };
 
   UserModel.sync();
 }

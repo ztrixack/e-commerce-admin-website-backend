@@ -49,7 +49,7 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-UserSchema.pre('save', function (next) {
+UserSchema.pre('save', next => {
   if (this.isModified('password')) {
     this.password = this._hashPassword(this.password);
   }
@@ -78,6 +78,9 @@ UserSchema.methods = {
       username: this.username,
       accesstoken: this.createToken(),
     };
+  },
+  findByUsername(username) {
+    return findOne({ username });
   },
 };
 

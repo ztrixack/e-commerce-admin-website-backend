@@ -14,7 +14,7 @@ const localStrategy = new LocalStrategy(
   localOpts,
   async (username, password, done) => {
     try {
-      const user = await User.findOne({ username });
+      const user = await User.findByUsername(username);
       if (!user) {
         return done(null, false);
       } else if (!user.authenticateUser(password)) {
@@ -43,6 +43,7 @@ const jwtStrategy = new JWTStrategy(jwtOpts, async (payload, done) => {
 
     return done(null, user);
   } catch (e) {
+    console.log(e);
     return done(e, false);
   }
 });

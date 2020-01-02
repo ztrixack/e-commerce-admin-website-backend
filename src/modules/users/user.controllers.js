@@ -10,7 +10,7 @@ const signup = async (req, res) => {
   }
 };
 
-const login = (req, res, next) => {
+const login = (req, res) => {
   return res.status(200).json(req.user.toJSONToken());
 };
 
