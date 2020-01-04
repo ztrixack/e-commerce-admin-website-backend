@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const Sequelize = require('sequelize');
 const jwt = require('jsonwebtoken');
+const rand = require('rand-token');
 
 const config = require('../../config');
 const db = require('../../config/database.sequelize');
@@ -58,17 +59,40 @@ if (config.database.sql) {
   };
   UserModel.prototype.toJSONToken = function() {
     return {
-      _id: this.id,
-      username: this.username,
-      accesstoken: this.createToken(),
+      access_token: this.createAccessToken(),
+      token_type: 'bearer',
+      expires_in: 1800,
+      refresh_token: this.createRefreshToken(),
     };
   };
-  UserModel.prototype.createToken = function() {
+  UserModel.prototype.createAccessToken = function() {
     return jwt.sign(
       {
-        _id: this.id,
+        jti: rand.uid(16),
+        username: this.username,
+        email: this.email,
+        roles: this.roles,
+        scopes: ['ACCESS'],
       },
-      config.jwt.secret,
+      config.jwt.accessToken.secret,
+      {
+        expiresIn: config.jwt.accessToken.expire,
+        algorithm: config.jwt.accessToken.algorithm,
+      },
+    );
+  };
+  UserModel.prototype.createRefreshToken = function() {
+    return jwt.sign(
+      {
+        jti: rand.uid(16),
+        username: this.username,
+        scopes: ['REFRESH'],
+      },
+      config.jwt.refreshToken.secret,
+      {
+        expiresIn: config.jwt.refreshToken.expire,
+        algorithm: config.jwt.refreshToken.algorithm,
+      },
     );
   };
   UserModel.prototype.authenticateUser = function(password) {

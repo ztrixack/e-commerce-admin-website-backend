@@ -6,52 +6,74 @@ const ExtractJwt = require('passport-jwt').ExtractJwt;
 const config = require('../config');
 const User = require('../modules/users/user.model');
 
-const localOpts = {
-  usernameField: 'username',
-};
-
 const localStrategy = new LocalStrategy(
-  localOpts,
+  {
+    usernameField: 'username',
+  },
   async (username, password, done) => {
     try {
       const user = await User.findByUsername(username);
-      if (!user) {
-        return done(null, false);
-      } else if (!user.authenticateUser(password)) {
-        return done(null, false);
+      if (!user || !user.authenticateUser(password)) {
+        return done(new Error('Invalid username or password'));
       }
 
       return done(null, user);
     } catch (e) {
-      return done(e, false);
+      return done(e);
     }
   },
 );
 
-const jwtOpts = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: config.jwt.secret,
-};
+const jwtAccessStrategy = new JWTStrategy(
+  {
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: config.jwt.accessToken.secret,
+    algorithms: config.jwt.accessToken.algorithms,
+  },
+  async (payload, done) => {
+    try {
+      const user = await User.findByUsername(payload.username);
+      if (!user) {
+        return done(new Error('Invalid user'));
+      }
 
-const jwtStrategy = new JWTStrategy(jwtOpts, async (payload, done) => {
-  try {
-    const user = await User.findById(payload._id);
-
-    if (!user) {
-      return done(null, false);
+      return done(null, user);
+    } catch (e) {
+      console.log(e);
+      return done(e);
     }
+  },
+);
 
-    return done(null, user);
-  } catch (e) {
-    console.log(e);
-    return done(e, false);
-  }
-});
+const jwtRefreshStrategy = new JWTStrategy(
+  {
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: config.jwt.refreshToken.secret,
+    algorithms: config.jwt.refreshToken.algorithms,
+  },
+  async (payload, done) => {
+    try {
+      const user = await User.findByUsername(payload.username);
+      if (!user) {
+        return done(new Error('Invalid user'));
+      }
+
+      return done(null, user);
+    } catch (e) {
+      console.log(e);
+      return done(e);
+    }
+  },
+);
 
 passport.use(localStrategy);
-passport.use(jwtStrategy);
+passport.use('jwt-access', jwtAccessStrategy);
+passport.use('jwt-refresh', jwtRefreshStrategy);
 
-const authLocal = passport.authenticate('local', { session: false });
-const authJwt = passport.authenticate('jwt', { session: false });
+const authorization = passport.authenticate('local', { session: false });
+const jwtAccessToken = passport.authenticate('jwt-access', { session: false });
+const jwtRefreshToken = passport.authenticate('jwt-refresh', {
+  session: false,
+});
 
-module.exports = { authLocal, authJwt };
+module.exports = { authorization, jwtAccessToken, jwtRefreshToken };
