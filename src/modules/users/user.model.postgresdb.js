@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const Sequelize = require('sequelize');
 const jwt = require('jsonwebtoken');
+const rand = require('rand-token');
 
 const config = require('../../config');
 const db = require('../../config/database.sequelize');
@@ -38,10 +39,10 @@ const UserOptions = {
   freezeTableName: true,
   hooks: {
     beforeCreate: (user, options) => {
-      user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(config.jwt.salt));
-    },
-    afterCreate: (user, options) => {
-      return user.toJSON();
+      user.password = bcrypt.hashSync(
+        user.password,
+        bcrypt.genSaltSync(config.jwt.salt),
+      );
     },
   },
 };
@@ -50,24 +51,59 @@ let UserModel;
 
 if (config.database.sql) {
   const sequelize = db();
-  UserModel = sequelize.define('users', UserSchema, UserOptions)
+  UserModel = sequelize.define('users', UserSchema, UserOptions);
   UserModel.prototype.toJSON = function() {
+    const values = Object.assign({}, this.get());
+    delete values.password;
+    return values;
+  };
+  UserModel.prototype.toJSONToken = function() {
     return {
-      _id: this.id,
-      username: this.username,
-      accesstoken: this.createToken(),
+      access_token: this.createAccessToken(),
+      token_type: 'bearer',
+      expires_in: 1800,
+      created_at: Date.now(),
+      refresh_token: this.createRefreshToken(),
     };
   };
-  UserModel.prototype.createToken = function() {
+  UserModel.prototype.createAccessToken = function() {
     return jwt.sign(
       {
-        _id: this.id,
+        jti: rand.uid(16),
+        username: this.username,
+        email: this.email,
+        roles: this.roles,
+        scopes: ['ACCESS'],
       },
-      config.jwt.secret,
+      config.jwt.accessToken.secret,
+      {
+        expiresIn: config.jwt.accessToken.expire,
+        algorithm: config.jwt.accessToken.algorithm,
+      },
+    );
+  };
+  UserModel.prototype.createRefreshToken = function() {
+    return jwt.sign(
+      {
+        jti: rand.uid(16),
+        username: this.username,
+        scopes: ['REFRESH'],
+      },
+      config.jwt.refreshToken.secret,
+      {
+        expiresIn: config.jwt.refreshToken.expire,
+        algorithm: config.jwt.refreshToken.algorithm,
+      },
     );
   };
   UserModel.prototype.authenticateUser = function(password) {
     return bcrypt.compareSync(password, this.password);
+  };
+  UserModel.findById = function(id) {
+    return UserModel.findOne({ where: { id } });
+  };
+  UserModel.findByUsername = function(username) {
+    return UserModel.findOne({ where: { username } });
   };
 
   UserModel.sync();

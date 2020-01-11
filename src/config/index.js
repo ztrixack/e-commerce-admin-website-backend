@@ -17,11 +17,20 @@ const config = {
   database: {
     connector: process.env.DATABASE_CONNECTOR,
     url: process.env.DATABASE_URL,
-    sql: process.env.DATABASE_CONNECTOR === 'postgresdb'
+    sql: process.env.DATABASE_CONNECTOR === 'postgresdb',
   },
   jwt: {
     salt: 13,
-    secret: process.env.JWT_SECRET,
+    accessToken: {
+      secret: process.env.JWT_ACCESS_TOKEN_SECRET,
+      expire: process.env.JWT_ACCESS_TOKEN_EXPIRE,
+      algorithm: process.env.JWT_ACCESS_TOKEN_ALGORITHM,
+    },
+    refreshToken: {
+      secret: process.env.JWT_REFRESH_TOKEN_SECRET,
+      expire: process.env.JWT_REFRESH_TOKEN_EXPIRE,
+      algorithm: process.env.JWT_REFRESH_TOKEN_ALGORITHM,
+    },
   },
   allowedOrigins: (process.env.ALLOWED_ORIGINS || '').split(','),
 };
