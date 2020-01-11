@@ -35,4 +35,6 @@ const config = {
   allowedOrigins: (process.env.ALLOWED_ORIGINS || '').split(','),
 };
 
+console.log('config: ' + JSON.stringify(config));
+
 module.exports = config;

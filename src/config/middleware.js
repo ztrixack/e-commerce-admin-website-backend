@@ -16,10 +16,11 @@ const middlewareConfig = app => {
     app.use(compression());
     app.use(helmet());
     app.use(cors({
+      exposedHeaders: ['Content-Length'],
       origin: function(origin, callback){
-        // allow requests with no origin 
-        // (like mobile apps or curl requests)
+        // allow requests with no origin (like mobile apps or curl requests)
         if(!origin) return callback(null, true);
+        console.log('origin: ' + origin);
         if(config.allowedOrigins.indexOf(origin) === -1){
           var msg = 'The CORS policy for this site does not ' +
                     'allow access from the specified Origin.';
