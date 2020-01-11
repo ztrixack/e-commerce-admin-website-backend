@@ -27,6 +27,8 @@ const ProductSchema = {
   },
 };
 
+const ProductDefault = { image: '', name: '', price: 0, hidden: false };
+
 const ProductOptions = {
   freezeTableName: true,
 };
@@ -39,6 +41,31 @@ if (config.database.sql) {
 
   ProductModel.findById = function(id) {
     return ProductModel.findOne({ where: { id } });
+  };
+
+  ProductModel.replaceById = function(id, raw) {
+    const data = Object.assign(ProductDefault, raw);
+    return ProductModel.update(data, {
+      where: { id },
+      returning: true,
+      plain: true,
+    }).then(function(result) {
+      return result[1];
+    });
+  };
+
+  ProductModel.updateById = function(id, data) {
+    return ProductModel.update(data, {
+      where: { id },
+      returning: true,
+      plain: true,
+    }).then(function(result) {
+      return result[1];
+    });
+  };
+
+  ProductModel.destroyById = function(id) {
+    return ProductModel.destroy({ where: { id } });
   };
 
   ProductModel.sync();

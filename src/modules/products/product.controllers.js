@@ -30,4 +30,34 @@ const retrieveOne = async (req, res) => {
   }
 };
 
-module.exports = { create, retrieveAll, retrieveOne };
+const replace = async (req, res) => {
+  try {
+    const product = await Product.replaceById(req.params.id, req.body);
+    return res.status(200).json(product);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(e);
+  }
+};
+
+const update = async (req, res) => {
+  try {
+    const product = await Product.updateById(req.params.id, req.body);
+    return res.status(200).json(product);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(e);
+  }
+};
+
+const destroy = async (req, res) => {
+  try {
+    await Product.destroyById(req.params.id);
+    return res.status(204).end();
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(e);
+  }
+};
+
+module.exports = { create, retrieveAll, retrieveOne, replace, update, destroy };
