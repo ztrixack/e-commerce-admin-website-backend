@@ -36,6 +36,11 @@ let ProductModel;
 if (config.database.sql) {
   const sequelize = db();
   ProductModel = sequelize.define('products', ProductSchema, ProductOptions);
+
+  ProductModel.findById = function(id) {
+    return ProductModel.findOne({ where: { id } });
+  };
+
   ProductModel.sync();
 }
 
