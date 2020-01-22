@@ -2,13 +2,35 @@ const Router = require('express').Router;
 
 const controllers = require('./product.controllers');
 
+const auths = require('../../services/auth.services');
+
 const routes = new Router();
 
-routes.post('/', controllers.create);
 routes.get('/', controllers.retrieveAll);
 routes.get('/:id', controllers.retrieveOne);
-routes.put('/:id', controllers.replace);
-routes.patch('/:id', controllers.update);
-routes.delete('/:id', controllers.destroy);
+routes.post(
+  '/',
+  auths.jwtAccessToken,
+  auths.roleAccess(['admin']),
+  controllers.create,
+);
+routes.put(
+  '/:id',
+  auths.jwtAccessToken,
+  auths.roleAccess(['admin']),
+  controllers.replace,
+);
+routes.patch(
+  '/:id',
+  auths.jwtAccessToken,
+  auths.roleAccess(['admin']),
+  controllers.update,
+);
+routes.delete(
+  '/:id',
+  auths.jwtAccessToken,
+  auths.roleAccess(['admin']),
+  controllers.destroy,
+);
 
 module.exports = routes;

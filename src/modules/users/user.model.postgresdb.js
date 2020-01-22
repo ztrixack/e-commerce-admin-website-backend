@@ -33,6 +33,10 @@ const UserSchema = {
     type: Sequelize.STRING,
     allowNull: false,
   },
+  roles: {
+    type: Sequelize.ARRAY(Sequelize.STRING),
+    allowNull: false,
+  },
 };
 
 const UserOptions = {
