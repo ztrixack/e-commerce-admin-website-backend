@@ -39,6 +39,8 @@ const UserSchema = {
   },
 };
 
+const UserDefault = { email: '', firstname: '', lastname: '', roles: [] };
+
 const UserOptions = {
   freezeTableName: true,
   hooks: {
@@ -56,11 +58,13 @@ let UserModel;
 if (config.database.sql) {
   const sequelize = db();
   UserModel = sequelize.define('users', UserSchema, UserOptions);
+
   UserModel.prototype.toJSON = function() {
     const values = Object.assign({}, this.get());
     delete values.password;
     return values;
   };
+
   UserModel.prototype.toJSONToken = function() {
     return {
       access_token: this.createAccessToken(),
@@ -70,6 +74,7 @@ if (config.database.sql) {
       refresh_token: this.createRefreshToken(),
     };
   };
+
   UserModel.prototype.createAccessToken = function() {
     return jwt.sign(
       {
@@ -86,6 +91,7 @@ if (config.database.sql) {
       },
     );
   };
+
   UserModel.prototype.createRefreshToken = function() {
     return jwt.sign(
       {
@@ -100,14 +106,42 @@ if (config.database.sql) {
       },
     );
   };
+
   UserModel.prototype.authenticateUser = function(password) {
     return bcrypt.compareSync(password, this.password);
   };
+
   UserModel.findById = function(id) {
     return UserModel.findOne({ where: { id } });
   };
+
   UserModel.findByUsername = function(username) {
     return UserModel.findOne({ where: { username } });
+  };
+
+  UserModel.replaceById = function(id, raw) {
+    const data = Object.assign({}, UserDefault, raw);
+    return UserModel.update(data, {
+      where: { id },
+      returning: true,
+      plain: true,
+    }).then(function(result) {
+      return result[1];
+    });
+  };
+
+  UserModel.updateById = function(id, data) {
+    return UserModel.update(data, {
+      where: { id },
+      returning: true,
+      plain: true,
+    }).then(function(result) {
+      return result[1];
+    });
+  };
+
+  UserModel.destroyById = function(id) {
+    return UserModel.destroy({ where: { id } });
   };
 
   UserModel.sync();

@@ -17,4 +17,31 @@ routes.get(
   controllers.retrieve,
 );
 
+routes.get('/', controllers.retrieveAll);
+routes.get('/:id', controllers.retrieveOne);
+routes.post(
+  '/',
+  auths.jwtAccessToken,
+  auths.roleAccess(['admin']),
+  controllers.create,
+);
+routes.put(
+  '/:id',
+  auths.jwtAccessToken,
+  auths.roleAccess(['admin']),
+  controllers.replace,
+);
+routes.patch(
+  '/:id',
+  auths.jwtAccessToken,
+  auths.roleAccess(['admin']),
+  controllers.update,
+);
+routes.delete(
+  '/:id',
+  auths.jwtAccessToken,
+  auths.roleAccess(['admin']),
+  controllers.destroy,
+);
+
 module.exports = routes;

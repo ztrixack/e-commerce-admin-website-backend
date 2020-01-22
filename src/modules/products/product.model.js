@@ -44,7 +44,7 @@ if (config.database.sql) {
   };
 
   ProductModel.replaceById = function(id, raw) {
-    const data = Object.assign(ProductDefault, raw);
+    const data = Object.assign({}, ProductDefault, raw);
     return ProductModel.update(data, {
       where: { id },
       returning: true,
