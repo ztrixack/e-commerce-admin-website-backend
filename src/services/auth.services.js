@@ -76,4 +76,23 @@ const jwtRefreshToken = passport.authenticate('jwt-refresh', {
   session: false,
 });
 
-module.exports = { authorization, jwtAccessToken, jwtRefreshToken };
+const roleAccess = roles => async (req, res, next) => {
+  const userRoles = req.user.roles;
+  for (let key in userRoles) {
+    if (roles.indexOf(userRoles[key]) > -1) {
+      return next();
+    }
+  }
+
+  res.status(401).send('Unauthenticated');
+  const err = new Error('Unauthenticated');
+  err.status = 401;
+  return next(err);
+};
+
+module.exports = {
+  authorization,
+  jwtAccessToken,
+  jwtRefreshToken,
+  roleAccess,
+};
