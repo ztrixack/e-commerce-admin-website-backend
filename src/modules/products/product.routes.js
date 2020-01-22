@@ -11,25 +11,25 @@ routes.get('/:id', controllers.retrieveOne);
 routes.post(
   '/',
   auths.jwtAccessToken,
-  auths.roleAccess(['admin']),
+  auths.roleAccess(['admin', 'staff']),
   controllers.create,
 );
 routes.put(
   '/:id',
   auths.jwtAccessToken,
-  auths.roleAccess(['admin']),
+  auths.roleAccess(['admin', 'staff']),
   controllers.replace,
 );
 routes.patch(
   '/:id',
   auths.jwtAccessToken,
-  auths.roleAccess(['admin']),
+  auths.roleAccess(['admin', 'staff']),
   controllers.update,
 );
 routes.delete(
   '/:id',
   auths.jwtAccessToken,
-  auths.roleAccess(['admin']),
+  auths.roleAccess(['admin', 'staff']),
   controllers.destroy,
 );
 
