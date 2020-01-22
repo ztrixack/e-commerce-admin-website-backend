@@ -144,6 +144,15 @@ if (config.database.sql) {
     return UserModel.destroy({ where: { id } });
   };
 
+  UserModel.changePassword = function(id, password) {
+    const cryptPassword = bcrypt.hashSync(
+      password,
+      bcrypt.genSaltSync(config.jwt.salt),
+    );
+
+    return this.updateById(id, { password: cryptPassword });
+  };
+
   UserModel.sync();
 }
 

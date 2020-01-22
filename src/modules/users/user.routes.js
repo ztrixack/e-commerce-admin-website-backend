@@ -10,6 +10,12 @@ const routes = new Router();
 
 routes.post('/signup', validate(validations.signup), controllers.signup);
 routes.post('/signin', auths.authorization, controllers.signin);
+routes.post(
+  '/change-password',
+  auths.jwtAccessToken,
+  controllers.changePassword,
+);
+routes.get('/exist', controllers.exist);
 routes.get(
   '/me',
   auths.jwtAccessToken,
