@@ -16,12 +16,7 @@ routes.post(
   controllers.changePassword,
 );
 routes.get('/exist', controllers.exist);
-routes.get(
-  '/me',
-  auths.jwtAccessToken,
-  auths.roleAccess(['admin']),
-  controllers.retrieve,
-);
+routes.get('/me', auths.jwtAccessToken, controllers.retrieve);
 
 routes.get('/', controllers.retrieveAll);
 routes.get('/:id', controllers.retrieveOne);
