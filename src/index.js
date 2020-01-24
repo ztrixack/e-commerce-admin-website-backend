@@ -1,31 +1,31 @@
 const express = require('express');
 
+const config = require('./config');
+
+// const databaseConfig = require('./config/database.mongoose');
+const middlewareConfig = require('./config/middleware');
+
 const app = express();
-const { PORT = 5000 } = process.env;
 
-app.get('/', (req, res) => { res.send('App is working'); });
+// databaseConfig();
+middlewareConfig(app);
 
-app.use((req, res, next) => {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
-app.use((err, req, res) => {
-  res.status(err.status || 500);
-  res.json({'errors': {
-    message: err.message,
-    error: {}
-  }});
-});
+const indexRouter = require('./routes/index');
+const apiRouter = require('./modules');
+const errorRouter = require('./routes/error');
 
-async function startServer() {    
-  app.listen(PORT, err => {
+app.use('/', indexRouter);
+apiRouter(app);
+app.use('*', errorRouter);
+
+async function startServer() {
+  app.listen(config.port, err => {
     if (err) {
       console.log(err);
       return;
     }
 
-    console.log('server started at port:' + PORT);
+    console.log('server started at port:' + config.port);
   });
 }
 
