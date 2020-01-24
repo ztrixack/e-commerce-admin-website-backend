@@ -14,7 +14,9 @@ const localStrategy = new LocalStrategy(
     try {
       const user = await User.findByUsername(username);
       if (!user || !user.authenticateUser(password)) {
-        return done(new Error('Invalid username or password'));
+        const err = new Error('Invalid username or password');
+        err.status = 401;
+        return done(err);
       }
 
       return done(null, user);
@@ -34,7 +36,9 @@ const jwtAccessStrategy = new JWTStrategy(
     try {
       const user = await User.findByUsername(payload.username);
       if (!user) {
-        return done(new Error('Invalid user'));
+        const err = new Error('Invalid username');
+        err.status = 401;
+        return done(err);
       }
 
       return done(null, user);
@@ -55,7 +59,9 @@ const jwtRefreshStrategy = new JWTStrategy(
     try {
       const user = await User.findByUsername(payload.username);
       if (!user) {
-        return done(new Error('Invalid user'));
+        const err = new Error('Invalid username');
+        err.status = 401;
+        return done(err);
       }
 
       return done(null, user);
